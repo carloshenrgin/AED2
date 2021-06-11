@@ -86,7 +86,7 @@ int arvoreComFilhos(Trie* tr){
     return 0;
 }
 
-int removeTrie(Trie* tr, char *str){
+/*int removeTrie(Trie* tr, char *str){
     if(tr == NULL || !validaPalavra(str))
         return 0;
     // enquanto nao tiver chegado ao fim da string faz a consulta
@@ -114,7 +114,44 @@ int removeTrie(Trie* tr, char *str){
     }
 
     return 0;
+}*/
+
+int removeTrie(Trie* tr, char* str){
+    // se a arvore nao existe ou se eu to tentando remover algo que não é uma palavra (com caracteres fora do alfabeto ou com tamanho 0) eu retorno falha
+    if(*tr == NULL || strlen(str) == 0 || !validaPalavra(str))
+        return 0;
+
+    Trie noAtual = *tr, noPrevio;
+
+    for(int i = 0; i < strlen(str); i++){
+        // se eu não achei a palavra na árvore eu retorno falhao
+        if(noAtual->character[str[i] - 'a'] == NULL)
+            return 0;
+        else{
+            noPrevio = noAtual;
+            noAtual = noAtual->character[str[i] - 'a'];
+        }
+    }
+
+    // se o no atual não é fim de palavra o que eu tenho é a tentativa da remoção de um prefixo e não um membro da árvore. Falha
+    if(!(noAtual->ehFDP))
+        return 0;
+
+    // se eu tenho uma árvore com filhos eu só preciso desmarcar a flag de FDP (fim de palavra) porque o resto é prefixo de outro membro da árvore
+    if(arvoreComFilhos(&noAtual)){
+        noAtual->ehFDP = 0;
+        return 1;
+    }
+    else{
+        // libero o fim da palavra e associo o ponteiro que apontava pra ela no ramo imediatamente superior a NULL
+        free(noAtual);
+        noPrevio->character[str[strlen(str) - 1] - 'a'] = NULL;
+        return 1;
+    }
+
+    return 0;
 }
+
 
 void imprimeAux(Trie* tr, char *str, int pos){
     if(*tr == NULL)
@@ -141,7 +178,7 @@ void imprimeTrie(Trie* tr){
 }
 
 void autocompletarAux(Trie* tr, char *str, int pos, char* prefixo){
-    if(*tr == NULL)
+    if(*tr == NULL || tr == NULL)
         return;
 
     // chegou no fim de uma palavra com esse prefixo, imprime ele e depois os caracteres que vieram depois dele e tão guardados em str
@@ -179,4 +216,16 @@ void autocompletarTrie(Trie* tr, char *prefixo){
         tr = &((*tr)->character[prefixo[i] - 'a']);
         i++;
     }
+}
+
+void liberaTrie(Trie* tr){
+    if(tr == NULL || *tr == NULL)
+        return;
+    
+    for(int i = 0; i < 26; i++){
+        liberaTrie(&((*tr)->character[i]));
+    }
+
+    free(*tr);
+    *tr = NULL;
 }

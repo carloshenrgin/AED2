@@ -41,15 +41,20 @@ int main(){
     printf("Debug de printf numero 11. Tentativa de busca de concerne apos remocao\n");
     printf("%d\n", buscaTrie(tr, "concerne"));
     // Não achei depois de remover, então acho que deu certo
-    printf("Debug de printf numero 12. Tentativa de busca de conceito apos remocao de concerne (prefixos compartilhados)\n");
-    printf("%d\n", buscaTrie(tr, "conceito")); // Isso aqui funciona aparentemente, mas não tem como saber até o retorno da remoção dar certo
+    printf("Debug de printf numero 12. Tentativa de busca de concernente apos remocao de concerne (prefixo)\n");
+    printf("%d\n", buscaTrie(tr, "concernente")); // Isso aqui funciona aparentemente, mas não tem como saber até o retorno da remoção dar certo
 
+    printf("Tentando remover algo que não existe\n");
+    printf("%d\n", removeTrie(tr, "mundialdopalmeiras"));
+
+    //imprimeTrie(tr);
+    //printf("\nPre autocomplete\n\n");
+    //autocompletarTrie(tr, "con");
+    //printf("\nPos autocomplete\n\n");
+    //imprimeTrie(tr);
+
+    liberaTrie(tr);
     imprimeTrie(tr);
-    printf("\nPre autocomplete\n\n");
-    autocompletarTrie(tr, "con");
-    printf("\n\nPos autocomplete\n");
-    imprimeTrie(tr);
-    // A impressão não funcionou. Precisa trabalhar nela
-    // Falta fazer a destruição da árvore e o autocompletar, mas esse último só da pra fazer depois de arrumar a impressão
+
     return 0;
 }
