@@ -4,12 +4,12 @@
 #include "trie.h"
 
 struct trieNode{
-    int ehFDP; // flag pra verificar se é fim de uma palavra ou não
-    struct trieNode* character[TAM_ALFABETO]; // vetor de nós de Trie
+    int ehFDP; // flag pra verificar se � fim de uma palavra ou n�o
+    Trie character[TAM_ALFABETO]; // vetor de n�s de Trie
 };
 
 
-Trie* criaTrie(){ // aloco um ponteiro para um novo nó, inicializo ele como não sendo fim de uma palavra e preencho cada um dos campos que representam os caracteres com NULL
+Trie* criaTrie(){ // aloco um ponteiro para um novo n�, inicializo ele como n�o sendo fim de uma palavra e preencho cada um dos campos que representam os caracteres com NULL
     Trie* no = (Trie*) malloc(sizeof(Trie));
     *no = (Trie) malloc(sizeof(struct trieNode));
     if(no != NULL){
@@ -27,20 +27,20 @@ int insereTrie(Trie* tr, char *str){
 
     Trie noAtual = *tr;
     for(int i = 0; i < strlen(str); i++){
-        int indice = str[i] - 'a'; // pego a posição no alfabeto do caractere atual a ser inserido
-        if(noAtual->character[indice] == NULL){ // se esse caractere já estiver inserido, ou seja, o prefixo da palavra até esse ponto existir eu não entro aqui
-            // se não foi inserido, eu entro para criar esse novo caractere
+        int indice = str[i] - 'a'; // pego a posi��o no alfabeto do caractere atual a ser inserido
+        if(noAtual->character[indice] == NULL){ // se esse caractere j� estiver inserido, ou seja, o prefixo da palavra at� esse ponto existir eu n�o entro aqui
+            // se n�o foi inserido, eu entro para criar esse novo caractere
             noAtual->character[indice] = (Trie) malloc(sizeof(struct trieNode));
             noAtual->character[indice]->ehFDP = 0;
             for(int j = 0; j < TAM_ALFABETO; j++)
-                noAtual->character[indice]->character[j] = NULL;   
+                noAtual->character[indice]->character[j] = NULL;
         }
 
-        // aqui eu avanço o noAtual pra continuar alocando novas árvores para cada caractere inserido
+        // aqui eu avan�o o noAtual pra continuar alocando novas �rvores para cada caractere inserido
         noAtual = noAtual->character[indice];
     }
 
-    // eu marco o nó a frente como fim da palavra
+    // eu marco o n� a frente como fim da palavra
     noAtual->ehFDP = 1;
     return 1;
 }
@@ -63,9 +63,9 @@ int buscaTrie(Trie* tr, char *str){
     for(int i = 0; i < strlen(str); i++){
         int indice = str[i] - 'a';
         noAtual = noAtual->character[indice];
-        
+
         // se eu cheguei no fim de um caminho da Trie antes de chegar no fim da string passada
-        // essa string não existe na Trie
+        // essa string n�o existe na Trie
         if(noAtual == NULL)
             return 0;
     }
@@ -74,7 +74,7 @@ int buscaTrie(Trie* tr, char *str){
 }
 
 int arvoreComFilhos(Trie* tr){
-    // se o ponteiro pra essa árvore é nulo, não tem como o nó ter filhos
+    // se o ponteiro pra essa �rvore � nulo, n�o tem como o n� ter filhos
     if(tr == NULL)
         return 0;
 
@@ -89,8 +89,6 @@ int arvoreComFilhos(Trie* tr){
 int removeTrie(Trie* tr, char *str){
     if(tr == NULL || !validaPalavra(str))
         return 0;
-
-
     // enquanto nao tiver chegado ao fim da string faz a consulta
     if(strlen(str) > 0){
         int indice = str[0] - 'a';
@@ -119,9 +117,9 @@ int removeTrie(Trie* tr, char *str){
 }
 
 void imprimeAux(Trie* tr, char *str, int pos){
-    if(tr == NULL)
+    if(*tr == NULL)
         return;
-    
+
     if((*tr)->ehFDP){
         for(int i = 0; i < pos; i++)
             printf("%c", str[i]);
@@ -129,14 +127,56 @@ void imprimeAux(Trie* tr, char *str, int pos){
         printf("\n");
     }
     for(int i = 0; i < TAM_ALFABETO; i++){
-        if((*tr)->character[i] != NULL)
-            str[i] = i + 'a';
+        if((*tr)->character[i] != NULL){
+            str[pos] = i + 'a';
             imprimeAux(&((*tr)->character[i]), str, pos+1);
+        }
     }
 }
 
 void imprimeTrie(Trie* tr){
-    char str[26];
+    char str[26] = "";
     imprimeAux(tr, str, 0);
 
+}
+
+void autocompletarAux(Trie* tr, char *str, int pos, char* prefixo){
+    if(*tr == NULL)
+        return;
+
+    // chegou no fim de uma palavra com esse prefixo, imprime ele e depois os caracteres que vieram depois dele e tão guardados em str
+    if((*tr)->ehFDP){
+        printf("%s", prefixo);
+        for(int i = 0; i < pos; i++)
+            printf("%c", str[i]);
+
+        printf("\n");
+    }
+    // vai chamando recursivamente onde quer que existam caracteres depois daquele prefixo
+    // os caracteres achados a cada chamada são guardados em str
+    for(int i = 0; i < TAM_ALFABETO; i++){
+        if((*tr)->character[i] != NULL){
+            str[pos] = i + 'a';
+            autocompletarAux(&((*tr)->character[i]), str, pos+1, prefixo);
+        }
+    }
+}
+
+void autocompletarTrie(Trie* tr, char *prefixo){
+    int i = 0;
+    while(1){
+        // se eu avancei na árvore até chegar no fim do prefixo eu chamo a função auxiliar responsável pelo autocomplete
+        if(strlen(prefixo) == i){
+            char str[26]= "";
+            autocompletarAux(tr, str, 0, prefixo);
+            return;
+        }
+        // if que verifica se o prefixo está na árvore, olhando caractere a caractere nas subárvores
+        if((*tr)->character[prefixo[i] - 'a'] == NULL){
+            return;
+        }
+        // avança a árvore pra quando começar a autocompletar não ter que refazer o percorrimento desde o início dela, mas sim do último caractere do prefixo
+        tr = &((*tr)->character[prefixo[i] - 'a']);
+        i++;
+    }
 }

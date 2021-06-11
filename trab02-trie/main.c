@@ -45,8 +45,11 @@ int main(){
     printf("%d\n", buscaTrie(tr, "conceito")); // Isso aqui funciona aparentemente, mas não tem como saber até o retorno da remoção dar certo
 
     imprimeTrie(tr);
+    printf("\nPre autocomplete\n\n");
+    autocompletarTrie(tr, "con");
+    printf("\n\nPos autocomplete\n");
+    imprimeTrie(tr);
     // A impressão não funcionou. Precisa trabalhar nela
     // Falta fazer a destruição da árvore e o autocompletar, mas esse último só da pra fazer depois de arrumar a impressão
-    
     return 0;
 }

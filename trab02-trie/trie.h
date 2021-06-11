@@ -8,3 +8,4 @@ int buscaTrie(Trie* tr, char *str);
 int removeTrie(Trie* tr, char *str);
 void imprimeTrie(Trie* tr);
 //void imprimeAux(Trie* tr, char *str, int pos);
+void autocompletarTrie(Trie* tr, char *prefixo);
